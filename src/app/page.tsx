@@ -1,65 +1,121 @@
-import Image from "next/image";
+"use client";
+
+import { useRef, useState } from "react";
+import { BilanData, defaultBilanData, emptyBilanData } from "@/types/bilan";
+import FormPanel from "@/components/FormPanel";
+import PreviewPanel from "@/components/PreviewPanel";
+import SheetPreview from "@/components/SheetPreview";
 
 export default function Home() {
+  const [data, setData] = useState<BilanData>(defaultBilanData);
+  const [loading, setLoading] = useState(false);
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  function handleChange(field: keyof BilanData, value: string) {
+    setData((prev) => ({ ...prev, [field]: value }));
+  }
+
+  function handleReset() {
+    if (!confirm("Vider tous les champs ?")) return;
+    setData({ ...emptyBilanData, docDate: new Date().toISOString().slice(0, 10) });
+  }
+
+  async function handleDownload() {
+    if (!pdfRef.current) return;
+    setLoading(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas"),
+        import("jspdf").then((m) => ({ jsPDF: m.jsPDF })),
+      ]);
+
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2,
+        backgroundColor: "#ffffff",
+        useCORS: true,
+        width: 794,
+        windowWidth: 794,
+      });
+
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      const pw = pdf.internal.pageSize.getWidth(); // 210mm
+      const ph = pdf.internal.pageSize.getHeight(); // 297mm
+
+      // Hauteur d'une page A4 en pixels canvas (scale 2)
+      const pageHeightPx = Math.round((canvas.width * ph) / pw);
+      const totalPages = Math.ceil(canvas.height / pageHeightPx);
+
+      for (let i = 0; i < totalPages; i++) {
+        if (i > 0) pdf.addPage();
+
+        const pageCanvas = document.createElement("canvas");
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = pageHeightPx;
+
+        const ctx = pageCanvas.getContext("2d")!;
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+        const srcY = i * pageHeightPx;
+        const srcH = Math.min(pageHeightPx, canvas.height - srcY);
+        ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
+
+        pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", 0, 0, pw, ph);
+      }
+
+      const prenom = data.patPrenom || "patient";
+      const nom = data.patNom || "";
+      const fn =
+        ("bilan_" + prenom + "_" + nom)
+          .replace(/\s+/g, "_")
+          .replace(/_+$/, "") + ".pdf";
+      pdf.save(fn);
+    } catch (e) {
+      alert("Erreur PDF : " + (e as Error).message);
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <>
+      <header className="px-6 py-4 bg-white border-b border-[#d0d2d6] flex items-baseline gap-3 flex-wrap">
+        <h1 className="text-[17px] font-semibold m-0">
+          Bilan neuro-visuel{" "}
+          <span className="text-[#2f5fa8]">→</span> PDF
+        </h1>
+        <p className="m-0 text-[#6b6e74] text-[13px]">
+          Remplis les champs, l&apos;aperçu se met à jour en direct, puis
+          télécharge le PDF.
+        </p>
+      </header>
+
+      <div className="grid grid-cols-[540px_1fr] items-start max-[1080px]:grid-cols-1">
+        <FormPanel
+          data={data}
+          onChange={handleChange}
+          onDownload={handleDownload}
+          onReset={handleReset}
+          loading={loading}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        <PreviewPanel data={data} />
+      </div>
+
+      {/* Élément caché à taille naturelle utilisé exclusivement pour la capture PDF */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: "-9999px",
+          width: 794,
+          pointerEvents: "none",
+          zIndex: -1,
+        }}
+      >
+        <SheetPreview ref={pdfRef} data={data} />
+      </div>
+    </>
   );
 }
