@@ -3,19 +3,6 @@
 import { forwardRef } from "react";
 import { BilanData } from "@/types/bilan";
 
-function esc(s: string): string {
-  return (s || "").replace(/[&<>"']/g, (c) => {
-    const map: Record<string, string> = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-    };
-    return map[c];
-  });
-}
-
 function dateFr(iso: string): string {
   if (!iso) return "";
   const d = new Date(iso + "T00:00:00");
@@ -78,7 +65,12 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const metaLines = data.pratMeta;
   const firstMetaLine = (metaLines.split("\n")[0] || "").trim();
 
-  const footerProps = { prenom, nom, pratNom: data.pratNom, firstMetaLine };
+  const footerProps = {
+    patPrenom: data.patPrenom,
+    patNom: data.patNom,
+    pratNom: data.pratNom,
+    firstMetaLine,
+  };
 
   return (
     <div ref={ref}>
@@ -97,7 +89,7 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         >
           <div>
             <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>
-              {esc(data.pratNom) || "Praticien"}
+              {data.pratNom || "Praticien"}
             </p>
             <p
               style={{
@@ -192,14 +184,14 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           {data.hCoord && (
             <div style={{ display: "flex", gap: 6, lineHeight: 1.6, paddingLeft: 14 }}>
               <span>•</span>
-              <span style={{ fontWeight: 600, color: "#222" }}>Dans l&apos;espace :</span>
+              <span style={{ fontWeight: 600, color: "#222" }}>dans l&apos;espace :</span>
               <span>{data.hCoord}</span>
             </div>
           )}
           {data.hHoriz && (
             <div style={{ display: "flex", gap: 6, lineHeight: 1.6, paddingLeft: 14 }}>
               <span>•</span>
-              <span style={{ fontWeight: 600, color: "#222" }}>Sur le plan horizontal :</span>
+              <span style={{ fontWeight: 600, color: "#222" }}>sur le plan horizontal :</span>
               <span>{data.hHoriz}</span>
             </div>
           )}
@@ -227,7 +219,7 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
         >
           <div>
             <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>
-              {esc(data.pratNom) || "Praticien"}
+              {data.pratNom || "Praticien"}
             </p>
             <p
               style={{
@@ -322,15 +314,15 @@ function KvBlock({ children }: { children: React.ReactNode }) {
 }
 
 function PageFooter({
-  prenom,
-  nom,
+  patPrenom,
+  patNom,
   pratNom,
   firstMetaLine,
   page,
   total,
 }: {
-  prenom: string;
-  nom: string;
+  patPrenom: string;
+  patNom: string;
   pratNom: string;
   firstMetaLine: string;
   page: number;
@@ -355,7 +347,7 @@ function PageFooter({
     >
       <div>
         Bilan neuro-visuel
-        {prenom !== "<Prénom>" ? ` — ${prenom} ${nom}` : ""}
+        {patPrenom ? ` — ${patPrenom} ${patNom}` : ""}
       </div>
       <div style={{ color: "#888" }}>
         {page} / {total}
