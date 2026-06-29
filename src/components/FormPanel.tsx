@@ -128,8 +128,11 @@ export default function FormPanel({ data, onChange, onDownload, onReset, loading
       </Fieldset>
 
       <Fieldset legend="Habilités visuelles">
-        <Field label="Coordination oculo-manuelle"><input type="text" className={inputCls} {...inp("hCoord")} /></Field>
-        <Field label="Sur plan horizontal"><input type="text" className={inputCls} {...inp("hHoriz")} /></Field>
+        <div className="mb-3">
+          <p className="block text-xs font-semibold text-[#6b6e74] mb-1 underline">Coordination oculo-manuelle</p>
+          <Field label="• dans l'espace :"><input type="text" className={inputCls} {...inp("hCoord")} /></Field>
+          <Field label="• sur le plan horizontal :"><input type="text" className={inputCls} {...inp("hHoriz")} /></Field>
+        </div>
         <Field label="Habilités visio-perceptives 2D (Bmti)"><input type="text" className={inputCls} {...inp("hBmti")} /></Field>
         <Field label="Habilités visuo-spatiales (TPVSE)"><input type="text" className={inputCls} {...inp("hTpvse")} /></Field>
         <Field label="Habilité visuelle pour le graphisme"><input type="text" className={inputCls} {...inp("hGraph")} /></Field>
