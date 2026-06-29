@@ -2,20 +2,7 @@
 
 import { forwardRef } from "react";
 import { BilanData } from "@/types/bilan";
-
-function dateFr(iso: string): string {
-  if (!iso) return "";
-  const d = new Date(iso + "T00:00:00");
-  if (isNaN(d.getTime())) return iso;
-  return (
-    "le " +
-    d.toLocaleDateString("fr-FR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    })
-  );
-}
+import { dateFr, extractFirstMetaLine } from "@/lib/utils";
 
 function KvRow({
   label,
@@ -63,7 +50,7 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const prenom = data.patPrenom || "<Prénom>";
   const nom = data.patNom || "<Nom>";
   const metaLines = data.pratMeta;
-  const firstMetaLine = (metaLines.split("\n")[0] || "").trim();
+  const firstMetaLine = extractFirstMetaLine(metaLines);
 
   const footerProps = {
     patPrenom: data.patPrenom,

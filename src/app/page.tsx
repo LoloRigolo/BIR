@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { BilanData, defaultBilanData, emptyBilanData } from "@/types/bilan";
+import { buildPdfFilename, calcPageHeightPx, calcTotalPages } from "@/lib/utils";
 import FormPanel from "@/components/FormPanel";
 import PreviewPanel from "@/components/PreviewPanel";
 import SheetPreview from "@/components/SheetPreview";
@@ -41,9 +42,8 @@ export default function Home() {
       const pw = pdf.internal.pageSize.getWidth(); // 210mm
       const ph = pdf.internal.pageSize.getHeight(); // 297mm
 
-      // Hauteur d'une page A4 en pixels canvas (scale 2)
-      const pageHeightPx = Math.round((canvas.width * ph) / pw);
-      const totalPages = Math.ceil(canvas.height / pageHeightPx);
+      const pageHeightPx = calcPageHeightPx(canvas.width);
+      const totalPages = calcTotalPages(canvas.height, canvas.width);
 
       for (let i = 0; i < totalPages; i++) {
         if (i > 0) pdf.addPage();
@@ -63,13 +63,7 @@ export default function Home() {
         pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", 0, 0, pw, ph);
       }
 
-      const prenom = data.patPrenom || "patient";
-      const nom = data.patNom || "";
-      const fn =
-        ("bilan_" + prenom + "_" + nom)
-          .replace(/\s+/g, "_")
-          .replace(/_+$/, "") + ".pdf";
-      pdf.save(fn);
+      pdf.save(buildPdfFilename(data.patPrenom, data.patNom));
     } catch (e) {
       alert("Erreur PDF : " + (e as Error).message);
       console.error(e);
