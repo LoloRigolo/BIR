@@ -183,8 +183,8 @@ const SheetPreview = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
             </div>
           )}
           <KvRow label="Habilités visio-perceptives 2D :" value={data.hBmti} />
-          <KvRow label="Habilités visuo-spatiales (TPVSE)" value={data.hTpvse} />
-          <KvRow label="Habilité visuelle pour le graphisme" value={data.hGraph} />
+          <KvRow label="Habilités visuo-spatiales (TPVSE) :" value={data.hTpvse} />
+          <KvRow label="Habilité visuelle pour le graphisme :" value={data.hGraph} />
           <KvRow label="Test de lecture :" value={data.hLect} />
         </KvBlock>
 
