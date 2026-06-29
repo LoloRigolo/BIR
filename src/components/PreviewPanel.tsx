@@ -54,8 +54,9 @@ export default function PreviewPanel({ data }: Props) {
             // puis on recouvre ces px avec un bloc blanc.
             const TOP_PAD = pageIndex === 1 ? 50 : 0;
             const offset = pageIndex * A4_H - TOP_PAD;
+            const boxHeight = (A4_H + TOP_PAD) * scale;
             return (
-              <div key={pageIndex} style={{ ...pageBox, position: "relative" }}>
+              <div key={pageIndex} style={{ ...pageBox, height: boxHeight, position: "relative" }}>
                 <div
                   style={{
                     transformOrigin: "top left",
