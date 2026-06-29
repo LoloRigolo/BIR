@@ -94,8 +94,8 @@ export default function FormPanel({ data, onChange, onDownload, onReset, loading
         </div>
       </Fieldset>
 
-      <Fieldset legend={<>Anamnèse <TaTag /></>}>
-        <Field label="Texte libre" hint="(historique, contexte)">
+      <Fieldset legend={<>Anamnès <TaTag /></>}>
+        <Field label="Texte libre : 6 lignes max !" hint="(historique, contexte)">
           <textarea className={textareaCls + " min-h-[130px]"} {...inp("anamnese")} />
         </Field>
       </Fieldset>
