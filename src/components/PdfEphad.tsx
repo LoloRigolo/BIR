@@ -24,7 +24,7 @@ const S = StyleSheet.create({
     marginBottom: 8,
   },
   pratNom: { fontSize: 13, fontFamily: "Times-Bold", marginBottom: 1 },
-  pratMeta: { fontSize: 9, color: "#444", fontFamily: "Helvetica", lineHeight: 1.4 },
+  pratMeta: { fontSize: 9, color: "#444", fontFamily: "Helvetica", lineHeight: 1.2 },
   titleBlock: {
     alignItems: "center",
     borderBottomWidth: 2,
@@ -51,10 +51,10 @@ const S = StyleSheet.create({
     marginTop: 13,
     marginBottom: 4,
   },
-  kvRow: { flexDirection: "row", marginBottom: 1, lineHeight: 1.5 },
+  kvRow: { flexDirection: "row", marginBottom: 1, lineHeight: 1.2 },
   kvLabel: { fontFamily: "Helvetica-Bold", color: "#222", fontSize: 9.5, marginRight: 4 },
   kvValue: { fontFamily: "Helvetica", fontSize: 9.5, flex: 1 },
-  bodyText: { fontFamily: "Helvetica", fontSize: 9.5, lineHeight: 1.6, textAlign: "justify" },
+  bodyText: { fontFamily: "Helvetica", fontSize: 9.5, lineHeight: 1.35, textAlign: "justify" },
   checkRow: { flexDirection: "row", alignItems: "center", marginBottom: 3 },
   checkBox: {
     width: 9, height: 9,

@@ -24,7 +24,7 @@ const S = StyleSheet.create({
     marginBottom: 6,
   },
   pratNom: { fontSize: 13, fontFamily: "Times-Bold", marginBottom: 1 },
-  pratMeta: { fontSize: 9, color: "#444", fontFamily: "Helvetica", lineHeight: 1.4 },
+  pratMeta: { fontSize: 9, color: "#444", fontFamily: "Helvetica", lineHeight: 1.2 },
   headerDate: { fontSize: 9, color: "#444", fontFamily: "Helvetica" },
   sectionTitle: {
     fontFamily: "Helvetica-Bold",
@@ -36,11 +36,11 @@ const S = StyleSheet.create({
     marginTop: 13,
     marginBottom: 4,
   },
-  kvRow: { flexDirection: "row", marginBottom: 1, lineHeight: 1.5 },
+  kvRow: { flexDirection: "row", marginBottom: 1, lineHeight: 1.2 },
   kvLabel: { fontFamily: "Helvetica-Bold", color: "#222", fontSize: 9.5, marginRight: 4 },
   kvValue: { fontFamily: "Helvetica", fontSize: 9.5, flex: 1 },
-  bodyText: { fontFamily: "Helvetica", fontSize: 9.5, lineHeight: 1.6, textAlign: "justify" },
-  subItem: { flexDirection: "row", paddingLeft: 10, marginBottom: 1, lineHeight: 1.5 },
+  bodyText: { fontFamily: "Helvetica", fontSize: 9.5, lineHeight: 1.35, textAlign: "justify" },
+  subItem: { flexDirection: "row", paddingLeft: 10, marginBottom: 1, lineHeight: 1.2 },
   footer: {
     position: "absolute",
     left: 48,
@@ -140,7 +140,7 @@ export default function PdfBilan({ data }: { data: BilanData }) {
         <PageHeader data={data} />
 
         <Text style={{ fontSize: 10, marginTop: 16, marginBottom: 3 }}>Docteur,</Text>
-        <Text style={{ fontSize: 10, lineHeight: 1.5, marginBottom: 12 }}>
+        <Text style={{ fontSize: 10, lineHeight: 1.35, marginBottom: 10 }}>
           {`Veuillez trouver ci-après le bilan de neuro-visuel : de ${prenom} ${nom}`}
           {introSuffix ? ` ${introSuffix}` : ""}{" ;"}
         </Text>
@@ -169,7 +169,7 @@ export default function PdfBilan({ data }: { data: BilanData }) {
         <KvRow label="Mvts oculo-céphaliques / vestibulaires :" value={data.oMvts} />
 
         <SectionTitle label="Habilités visuelles" />
-        <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 9.5, textDecoration: "underline", color: "#222", lineHeight: 1.5 }}>
+        <Text style={{ fontFamily: "Helvetica-Bold", fontSize: 9.5, textDecoration: "underline", color: "#222", lineHeight: 1.2 }}>
           Coordination oculo-manuelle
         </Text>
         {!!data.hCoord && (
