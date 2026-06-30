@@ -1,15 +1,13 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { BilanData, defaultBilanData, emptyBilanData } from "@/types/bilan";
 import { BilanEphadData, defaultBilanEphadData, emptyBilanEphadData } from "@/types/bilanEphad";
-import { buildPdfFilename, calcPageHeightPx, calcTotalPages, localDateStr } from "@/lib/utils";
+import { buildPdfFilename, localDateStr } from "@/lib/utils";
 import FormPanel from "@/components/FormPanel";
 import PreviewPanel from "@/components/PreviewPanel";
-import SheetPreview from "@/components/SheetPreview";
 import FormEphad from "@/components/FormEphad";
 import PreviewEphad from "@/components/PreviewEphad";
-import SheetEphad from "@/components/SheetEphad";
 
 type Model = "bilan" | "ephad";
 
@@ -21,17 +19,15 @@ const MODELS: { id: Model; label: string }[] = [
 export default function Home() {
   const [model, setModel] = useState<Model>("bilan");
 
-  // â€” Bilan neuro-visuel â€”
+  // â€" Bilan neuro-visuel â€"
   const [bilanData, setBilanData] = useState<BilanData>(defaultBilanData);
-  const bilanRef = useRef<HTMLDivElement>(null);
 
-  // â€” EPADH â€”
+  // â€" EPADH â€"
   const [ephadData, setEphadData] = useState<BilanEphadData>(defaultBilanEphadData);
-  const ephadRef = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(false);
 
-  // â”€â”€ Handlers bilan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Handlers bilan â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
   function handleBilanChange(field: keyof BilanData, value: string) {
     setBilanData((prev) => ({ ...prev, [field]: value }));
@@ -42,7 +38,7 @@ export default function Home() {
     setBilanData({ ...emptyBilanData, docDate: localDateStr() });
   }
 
-  // â”€â”€ Handlers EPADH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ Handlers EPADH â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
   function handleEphadChange(field: keyof BilanEphadData, value: string | boolean) {
     setEphadData((prev) => ({ ...prev, [field]: value }));
@@ -53,52 +49,34 @@ export default function Home() {
     setEphadData({ ...emptyBilanEphadData, docDate: localDateStr() });
   }
 
-  // â”€â”€ TÃ©lÃ©chargement PDF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // â"€â"€ TÃ©lÃ©chargement PDF â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€â"€
 
   async function handleDownload() {
-    const ref = model === "bilan" ? bilanRef : ephadRef;
-    if (!ref.current) return;
     setLoading(true);
     try {
-      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
-        import("html2canvas"),
-        import("jspdf").then((m) => ({ jsPDF: m.jsPDF })),
-      ]);
-
-      const canvas = await html2canvas(ref.current, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-        useCORS: true,
-        width: 794,
-        windowWidth: 794,
-      });
-
-      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-      const pw = pdf.internal.pageSize.getWidth();
-      const ph = pdf.internal.pageSize.getHeight();
-
-      const pageHeightPx = calcPageHeightPx(canvas.width);
-      const totalPages = calcTotalPages(canvas.height, canvas.width);
-
-      for (let i = 0; i < totalPages; i++) {
-        if (i > 0) pdf.addPage();
-        const pageCanvas = document.createElement("canvas");
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = pageHeightPx;
-        const ctx = pageCanvas.getContext("2d")!;
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
-        const srcY = i * pageHeightPx;
-        const srcH = Math.min(pageHeightPx, canvas.height - srcY);
-        ctx.drawImage(canvas, 0, srcY, canvas.width, srcH, 0, 0, canvas.width, srcH);
-        pdf.addImage(pageCanvas.toDataURL("image/png"), "PNG", 0, 0, pw, ph);
-      }
-
+      const { pdf } = await import("@react-pdf/renderer");
       const filename =
         model === "bilan"
           ? buildPdfFilename(bilanData.patPrenom, bilanData.patNom)
           : buildPdfFilename(ephadData.patPrenom, ephadData.patNom, "ephad");
-      pdf.save(filename);
+
+      let blob: Blob;
+      if (model === "bilan") {
+        const { default: PdfBilan } = await import("@/components/PdfBilan");
+        blob = await pdf(<PdfBilan data={bilanData} />).toBlob();
+      } else {
+        const { default: PdfEphad } = await import("@/components/PdfEphad");
+        blob = await pdf(<PdfEphad data={ephadData} />).toBlob();
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (e) {
       alert("Erreur PDF : " + (e as Error).message);
       console.error(e);
@@ -109,7 +87,7 @@ export default function Home() {
 
   return (
     <>
-      {/* â”€â”€ Header â”€â”€ */}
+      {/* â"€â"€ Header â"€â"€ */}
       <header className="px-6 bg-white border-b border-[#d0d2d6]">
         <div className="flex items-center gap-4 pt-4 pb-3 flex-wrap">
           <h1 className="text-[17px] font-semibold m-0 mr-2">
@@ -138,7 +116,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* â”€â”€ Contenu selon le modÃ¨le â”€â”€ */}
+      {/* â"€â"€ Contenu selon le modÃ¨le â"€â"€ */}
       {model === "bilan" ? (
         <div className="grid grid-cols-[540px_1fr] items-start max-[1080px]:grid-cols-1">
           <FormPanel
@@ -163,11 +141,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Ã‰lÃ©ments cachÃ©s pour la capture PDF */}
-      <div aria-hidden="true" style={{ position: "fixed", top: 0, left: "-9999px", width: 794, pointerEvents: "none", zIndex: -1 }}>
-        <SheetPreview ref={bilanRef} data={bilanData} />
-        <SheetEphad ref={ephadRef} data={ephadData} />
-      </div>
     </>
   );
 }
