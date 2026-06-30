@@ -71,11 +71,15 @@ function PageFooter({
   patNom,
   pratNom,
   firstMetaLine,
+  page,
+  total,
 }: {
   patPrenom: string;
   patNom: string;
   pratNom: string;
   firstMetaLine: string;
+  page: number;
+  total: number;
 }) {
   return (
     <div
@@ -98,6 +102,7 @@ function PageFooter({
         Fiche d&apos;examen visuel
         {patPrenom ? ` — ${patPrenom} ${patNom}` : ""}
       </div>
+      <div style={{ color: "#888" }}>{page} / {total}</div>
       <div style={{ textAlign: "right" }}>
         <div style={{ fontWeight: "bold", color: "#222", fontSize: 12 }}>{pratNom}</div>
         <div>{firstMetaLine}</div>
@@ -108,6 +113,15 @@ function PageFooter({
 const SheetEphad = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
   const avlParts = formatAvLine(data.avlOd, data.avlOg, data.avlAcuite);
   const avpParts = formatAvLine(data.avpOd, data.avpOg, data.avpAcuite);
+  const firstMetaLine = extractFirstMetaLine(data.pratMeta);
+
+  const footerProps = {
+    patPrenom: data.patPrenom,
+    patNom: data.patNom,
+    pratNom: data.pratNom,
+    firstMetaLine,
+    total: 2,
+  };
 
   return (
     <div ref={ref}>
@@ -241,7 +255,64 @@ const SheetEphad = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
           </>
         )}
 
-        <PageFooter patPrenom={data.patPrenom} patNom={data.patNom} pratNom={data.pratNom} firstMetaLine={extractFirstMetaLine(data.pratMeta)} />
+        <PageFooter {...footerProps} page={1} />
+      </div>
+
+      {/* Page 2 — Conclusion */}
+      <div style={PAGE_STYLE}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            borderBottom: "2px solid #1a1a1a",
+            paddingBottom: 14,
+            marginBottom: 24,
+          }}
+        >
+          <div>
+            <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>
+              {data.pratNom || "Praticien"}
+            </p>
+            <p style={{ fontSize: 12, color: "#444", fontFamily: "Arial, sans-serif", margin: 0, lineHeight: 1.45, whiteSpace: "pre-line" }}>
+              {data.pratMeta}
+            </p>
+          </div>
+          {data.pratNom2 && (
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>{data.pratNom2}</p>
+              <p style={{ fontSize: 12, color: "#444", fontFamily: "Arial, sans-serif", margin: 0, lineHeight: 1.45, whiteSpace: "pre-line" }}>
+                {data.pratMeta2}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <p
+          style={{
+            fontFamily: "Arial, sans-serif",
+            fontSize: 14,
+            fontWeight: "bold",
+            textDecoration: "underline",
+            margin: "0 0 16px",
+          }}
+        >
+          CONCLUSION :
+        </p>
+        <p
+          style={{
+            fontFamily: "Arial, sans-serif",
+            fontSize: 12.5,
+            lineHeight: 1.7,
+            whiteSpace: "pre-line",
+            margin: 0,
+            textAlign: "justify",
+          }}
+        >
+          {data.conclusion.trim() ? data.conclusion.trim() : "—"}
+        </p>
+
+        <PageFooter {...footerProps} page={2} />
       </div>
     </div>
   );

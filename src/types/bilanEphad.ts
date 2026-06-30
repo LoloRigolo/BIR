@@ -47,6 +47,7 @@
 
   // Observations
   observations: string;
+  conclusion: string;
 }
 
 import { localDateStr } from "@/lib/utils";
@@ -79,6 +80,7 @@ export const defaultBilanEphadData: BilanEphadData = {
   examOct: false,
   examAutre: "",
   observations: "",
+  conclusion: "",
 };
 
 export const emptyBilanEphadData: BilanEphadData = {
@@ -109,4 +111,5 @@ export const emptyBilanEphadData: BilanEphadData = {
   examOct: false,
   examAutre: "",
   observations: "",
+  conclusion: "",
 };
