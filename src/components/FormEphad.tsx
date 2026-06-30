@@ -21,11 +21,13 @@ function Field({
 }) {
   return (
     <div className="mb-3">
-      <label className="block text-xs font-semibold text-[#6b6e74] mb-1">
-        {label}
-        {hint && <span className="font-normal italic text-[#9a9da3] ml-1">{hint}</span>}
+      <label className="block text-xs font-semibold text-[#6b6e74] mb-1 cursor-pointer">
+        <span>
+          {label}
+          {hint && <span className="font-normal italic text-[#9a9da3] ml-1">{hint}</span>}
+        </span>
+        {children}
       </label>
-      {children}
     </div>
   );
 }
