@@ -74,7 +74,7 @@ describe("emptyBilanEphadData", () => {
       "raOd", "raOg",
       "avlOd", "avlOg", "avlAcuite",
       "avpOd", "avpOg", "avpAcuite",
-      "correctionRetenue", "examAutre", "observations",
+      "correctionRetenue", "examAutre", "observations", "conclusion",
     ] as const;
     for (const field of stringFields) {
       expect(emptyBilanEphadData[field]).toBe("");

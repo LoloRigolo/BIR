@@ -157,6 +157,10 @@ export default function FormEphad({ data, onChange, onDownload, onReset, loading
         <textarea className={textareaCls} {...inp("observations")} />
       </Fieldset>
 
+      <Fieldset legend="Conclusion">
+        <textarea className={textareaCls} {...inp("conclusion")} />
+      </Fieldset>
+
       <div className="flex gap-2.5 flex-wrap sticky bottom-0 bg-[#f4f5f6] pt-3.5 pb-1">
         <button
           onClick={onDownload}
