@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { forwardRef } from "react";
 import { BilanEphadData } from "@/types/bilanEphad";
-import { dateFr } from "@/lib/utils";
+import { dateFr, extractFirstMetaLine, formatAvLine } from "@/lib/utils";
 
 interface Props {
   data: BilanEphadData;
@@ -13,240 +13,235 @@ const PAGE_STYLE: React.CSSProperties = {
   height: 1123,
   background: "#ffffff",
   color: "#1a1a1a",
-  fontFamily: "Arial, sans-serif",
-  padding: "48px 56px 80px",
+  fontFamily: "Georgia, 'Times New Roman', serif",
+  padding: "56px 64px 90px",
   boxSizing: "border-box",
   position: "relative",
   overflow: "hidden",
 };
 
-// ── Sous-composants ───────────────────────────────────────────────────────────
-
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <div
+    <h3
       style={{
-        fontSize: 11.5,
+        fontFamily: "Arial, sans-serif",
+        fontSize: 13,
         fontWeight: "bold",
-        letterSpacing: 0.5,
-        textTransform: "uppercase",
+        margin: "18px 0 6px",
         color: "#1a1a1a",
-        borderBottom: "1.5px solid #444",
-        paddingBottom: 2,
-        margin: "16px 0 10px",
+        borderBottom: "1px solid #ccc",
+        paddingBottom: 3,
       }}
     >
+      {children}
+    </h3>
+  );
+}
+
+function KvRow({ label, value }: { label: string; value: string }) {
+  if (!value) return null;
+  return (
+    <div style={{ display: "flex", gap: 6, lineHeight: 1.6 }}>
+      <span style={{ fontWeight: 600, color: "#222" }}>{label}</span>
+      <span>{value}</span>
+    </div>
+  );
+}
+
+function KvBlock({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, lineHeight: 1.6, margin: 0 }}>
       {children}
     </div>
   );
 }
 
-function FilledLine({ label, value }: { label?: string; value?: string }) {
+function CheckRow({ checked, label }: { checked: boolean; label: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", gap: 6, marginBottom: 9, fontSize: 12 }}>
-      {label && <span style={{ fontWeight: 600, whiteSpace: "nowrap" }}>{label}</span>}
-      <span
-        style={{
-          flex: 1,
-          minWidth: 60,
-          lineHeight: 1.8,
-          paddingLeft: 4,
-          color: "#1a1a1a",
-        }}
-      >
-        {value || ""}
-      </span>
-    </div>
-  );
-}
-
-function Checkbox({ checked, label }: { checked: boolean; label: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4, fontSize: 12 }}>
-      <span
-        style={{
-          display: "inline-block",
-          width: 12,
-          height: 12,
-          border: "1px solid #444",
-          flexShrink: 0,
-          position: "relative",
-        }}
-      >
-        {checked && (
-          <span style={{ position: "absolute", top: -1, left: 1, fontWeight: "bold", fontSize: 11 }}>✓</span>
-        )}
-      </span>
+    <div style={{ display: "flex", gap: 6, lineHeight: 1.6, alignItems: "center", fontFamily: "Arial, sans-serif", fontSize: 12.5 }}>
+      <span style={{ fontSize: 14, lineHeight: 1 }}>{checked ? "☑" : "☐"}</span>
       <span>{label}</span>
     </div>
   );
 }
 
-// ── Header EPADH ──────────────────────────────────────────────────────────────
 
-function PageHeader({ data }: { data: BilanEphadData }) {
+function PageFooter({
+  patPrenom,
+  patNom,
+  pratNom,
+  firstMetaLine,
+}: {
+  patPrenom: string;
+  patNom: string;
+  pratNom: string;
+  firstMetaLine: string;
+}) {
   return (
-    <div style={{ marginBottom: 14 }}>
-      {/* Praticiens */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          paddingBottom: 10,
-          borderBottom: "1px solid #ccc",
-          marginBottom: 8,
-        }}
-      >
-        <div>
-          <p style={{ fontSize: 14, fontWeight: "bold", margin: "0 0 1px" }}>
-            {data.pratNom || "Praticien"}
-          </p>
-          <p style={{ fontSize: 11, color: "#444", margin: 0, lineHeight: 1.5, whiteSpace: "pre-line" }}>
-            {data.pratMeta}
-          </p>
-        </div>
-        {data.pratNom2 && (
-          <div style={{ textAlign: "right" }}>
-            <p style={{ fontSize: 14, fontWeight: "bold", margin: "0 0 1px" }}>
-              {data.pratNom2}
-            </p>
-            <p style={{ fontSize: 11, color: "#444", margin: 0, lineHeight: 1.5, whiteSpace: "pre-line" }}>
-              {data.pratMeta2}
-            </p>
-          </div>
-        )}
+    <div
+      style={{
+        position: "absolute",
+        left: 64,
+        right: 64,
+        bottom: 40,
+        borderTop: "1px solid #bbb",
+        paddingTop: 10,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-end",
+        fontFamily: "Arial, sans-serif",
+        fontSize: 11,
+        color: "#555",
+      }}
+    >
+      <div>
+        Fiche d'examen visuel
+        {patPrenom ? ` — ${patPrenom} ${patNom}` : ""}
       </div>
-
-      {/* Titre */}
-      <div
-        style={{
-          textAlign: "center",
-          borderTop: "2px solid #1a1a1a",
-          borderBottom: "2px solid #1a1a1a",
-          padding: "7px 0 5px",
-          marginBottom: 10,
-        }}
-      >
-        <p style={{ fontSize: 15, fontWeight: "bold", letterSpacing: 1.5, margin: "0 0 2px", textTransform: "uppercase" }}>
-          Fiche d&apos;examen visuel
-        </p>
-        {data.docType && (
-          <p style={{ fontSize: 11.5, color: "#555", margin: 0, fontStyle: "italic" }}>
-            {data.docType}
-          </p>
-        )}
-      </div>
-
-      {/* Lieu + Date */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-        <FilledLine label="Lieu :" value={data.docLieu} />
-        <div style={{ marginLeft: 32, whiteSpace: "nowrap", fontSize: 12 }}>
-          <span style={{ fontWeight: 600 }}>Date : </span>
-            {dateFr(data.docDate) || ".......... / .......... / .........."}
-        </div>
+      <div style={{ textAlign: "right" }}>
+        <div style={{ fontWeight: "bold", color: "#222", fontSize: 12 }}>{pratNom}</div>
+        <div>{firstMetaLine}</div>
       </div>
     </div>
   );
 }
-
-// ── Composant principal ───────────────────────────────────────────────────────
-
 const SheetEphad = forwardRef<HTMLDivElement, Props>(({ data }, ref) => {
+  const avlParts = formatAvLine(data.avlOd, data.avlOg, data.avlAcuite);
+  const avpParts = formatAvLine(data.avpOd, data.avpOg, data.avpAcuite);
+
   return (
     <div ref={ref}>
       <div style={PAGE_STYLE}>
-        <PageHeader data={data} />
-
-        {/* Identité */}
-        <SectionTitle>Identité du patient</SectionTitle>
-        <div style={{ display: "flex", gap: 24 }}>
-          <div style={{ flex: 1 }}>
-            <FilledLine label="Nom :" value={data.patNom} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <FilledLine label="Prénom :" value={data.patPrenom} />
-          </div>
-        </div>
-        <FilledLine label="Date de naissance :" value={data.patDdn} />
-
-        {/* Anamnèse */}
-        <SectionTitle>Anamnèse</SectionTitle>
-        {[data.anamnese || "", "", ""].slice(0, 3).map((line, i) => (
-          <FilledLine key={i} value={i === 0 ? line : ""} />
-        ))}
-
-        {/* Équipement actuel */}
-        <SectionTitle>Équipement actuel</SectionTitle>
-        <FilledLine label="Correction optique portée :" value={data.equipCorrection} />
-
-        {/* Réfraction automatique */}
-        <SectionTitle>Réfraction automatique (RA)</SectionTitle>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <FilledLine label="Œil droit (OD) :" value={data.raOd} />
-          <FilledLine label="Œil gauche (OG) :" value={data.raOg} />
-        </div>
-
-        {/* Acuité visuelle */}
-        <SectionTitle>Acuité visuelle</SectionTitle>
-        <div style={{ fontSize: 12, marginBottom: 6 }}>
-          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 1fr 1fr", gap: 8, alignItems: "center", marginBottom: 4 }}>
-            <span style={{ fontWeight: 600 }}>Vision de loin (VL)</span>
-            <FilledLine label="OD :" value={data.avlOd} />
-            <FilledLine label="OG :" value={data.avlOg} />
-            <FilledLine label="Acuité :" value={data.avlAcuite} />
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 1fr 1fr", gap: 8, alignItems: "center" }}>
-            <span style={{ fontWeight: 600 }}>Vision de près (VP)</span>
-            <FilledLine label="OD :" value={data.avpOd} />
-            <FilledLine label="OG :" value={data.avpOg} />
-            <FilledLine label="Acuité :" value={data.avpAcuite} />
-          </div>
-        </div>
-
-        {/* Correction retenue */}
-        <SectionTitle>Correction optique retenue</SectionTitle>
-        <FilledLine value={data.correctionRetenue} />
-        <FilledLine />
-
-        {/* Examens complémentaires */}
-        <SectionTitle>Besoin d&apos;examens complémentaires</SectionTitle>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 24px" }}>
-          <Checkbox checked={data.examAucun} label="Aucun" />
-          <Checkbox checked={data.examOphtalmo} label="Consultation ophtalmologique" />
-          <Checkbox checked={data.examFondOeil} label="Fond d'œil" />
-          <Checkbox checked={data.examOct} label="OCT" />
-        </div>
-        <FilledLine label="Autre :" value={data.examAutre} />
-
-        {/* Observations */}
-        <SectionTitle>Observations</SectionTitle>
-        {["", "", ""].map((_, i) => (
-          <FilledLine key={i} value={i === 0 ? data.observations : ""} />
-        ))}
-
-        {/* Signatures */}
+        {/* En-tête praticiens */}
         <div
           style={{
-            position: "absolute",
-            left: 56,
-            right: 56,
-            bottom: 40,
             display: "flex",
             justifyContent: "space-between",
-            fontSize: 12,
-            borderTop: "1px solid #bbb",
-            paddingTop: 10,
+            alignItems: "flex-start",
+            borderBottom: "2px solid #1a1a1a",
+            paddingBottom: 14,
+            marginBottom: 10,
           }}
         >
           <div>
-            <span style={{ fontWeight: 600 }}>Signature Orthoptiste : </span>
+            <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>
+              {data.pratNom || "Praticien"}
+            </p>
+            <p style={{ fontSize: 12, color: "#444", fontFamily: "Arial, sans-serif", margin: 0, lineHeight: 1.45, whiteSpace: "pre-line" }}>
+              {data.pratMeta}
+            </p>
           </div>
           {data.pratNom2 && (
-            <div>
-              <span style={{ fontWeight: 600, paddingRight: 150 }}>Signature Opticien : </span>
+            <div style={{ textAlign: "right" }}>
+              <p style={{ fontSize: 17, fontWeight: "bold", margin: "0 0 2px" }}>{data.pratNom2}</p>
+              <p style={{ fontSize: 12, color: "#444", fontFamily: "Arial, sans-serif", margin: 0, lineHeight: 1.45, whiteSpace: "pre-line" }}>
+                {data.pratMeta2}
+              </p>
             </div>
           )}
         </div>
+
+        {/* Titre */}
+        <div style={{ textAlign: "center", borderBottom: "2px solid #1a1a1a", paddingBottom: 10, marginBottom: 10 }}>
+          <p style={{ fontSize: 15, fontWeight: "bold", letterSpacing: 1.5, margin: "0 0 2px", textTransform: "uppercase" }}>
+            Fiche d&apos;examen visuel
+          </p>
+          {data.docType && (
+            <p style={{ fontSize: 12, color: "#555", margin: 0, fontStyle: "italic", fontFamily: "Arial, sans-serif" }}>
+              {data.docType}
+            </p>
+          )}
+        </div>
+
+        {/* Lieu + Date */}
+        <div style={{ display: "flex", justifyContent: "space-between", fontFamily: "Arial, sans-serif", fontSize: 12, marginBottom: 4 }}>
+          {data.docLieu && <span><strong>Lieu :</strong> {data.docLieu}</span>}
+          <span><strong>Date :</strong> {dateFr(data.docDate)}</span>
+        </div>
+
+        {/* Identité */}
+        <SectionTitle>Identité du patient</SectionTitle>
+        <KvBlock>
+          <KvRow label="Nom :" value={data.patNom} />
+          <KvRow label="Prénom :" value={data.patPrenom} />
+          <KvRow label="Date de naissance :" value={data.patDdn} />
+        </KvBlock>
+
+        {/* Anamnèse */}
+        {data.anamnese && (
+          <>
+            <SectionTitle>Anamnèse</SectionTitle>
+            <p style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre-line", margin: "0 0 6px", textAlign: "justify" }}>
+              {data.anamnese.trim()}
+            </p>
+          </>
+        )}
+
+        {/* Équipement */}
+        {data.equipCorrection && (
+          <>
+            <SectionTitle>Équipement actuel</SectionTitle>
+            <KvBlock>
+              <KvRow label="Correction optique portée :" value={data.equipCorrection} />
+            </KvBlock>
+          </>
+        )}
+
+        {/* RA */}
+        {(data.raOd || data.raOg) && (
+          <>
+            <SectionTitle>Réfraction automatique (RA)</SectionTitle>
+            <KvBlock>
+              <KvRow label="OD :" value={data.raOd} />
+              <KvRow label="OG :" value={data.raOg} />
+            </KvBlock>
+          </>
+        )}
+
+        {/* AV */}
+        {(avlParts || avpParts) && (
+          <>
+            <SectionTitle>Acuité visuelle</SectionTitle>
+            <KvBlock>
+              {avlParts && <KvRow label="Vision de loin (VL) :" value={avlParts} />}
+              {avpParts && <KvRow label="Vision de près (VP) :" value={avpParts} />}
+            </KvBlock>
+          </>
+        )}
+
+        {/* Correction retenue */}
+        {data.correctionRetenue && (
+          <>
+            <SectionTitle>Correction optique retenue</SectionTitle>
+            <p style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre-line", margin: 0 }}>
+              {data.correctionRetenue.trim()}
+            </p>
+          </>
+        )}
+
+        {/* Examens complémentaires */}
+        <SectionTitle>Besoin d&apos;examens complémentaires</SectionTitle>
+        <KvBlock>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 24px" }}>
+            <CheckRow checked={data.examAucun} label="Aucun" />
+            <CheckRow checked={data.examOphtalmo} label="Consultation ophtalmologique" />
+            <CheckRow checked={data.examFondOeil} label="Fond d'œil" />
+            <CheckRow checked={data.examOct} label="OCT" />
+          </div>
+          <KvRow label="Autre :" value={data.examAutre} />
+        </KvBlock>
+
+        {/* Observations */}
+        {data.observations && (
+          <>
+            <SectionTitle>Observations</SectionTitle>
+            <p style={{ fontFamily: "Arial, sans-serif", fontSize: 12.5, lineHeight: 1.6, whiteSpace: "pre-line", margin: 0, textAlign: "justify" }}>
+              {data.observations.trim()}
+            </p>
+          </>
+        )}
+
+        <PageFooter patPrenom={data.patPrenom} patNom={data.patNom} pratNom={data.pratNom} firstMetaLine={extractFirstMetaLine(data.pratMeta)} />
       </div>
     </div>
   );

@@ -33,3 +33,9 @@ export function calcPageHeightPx(canvasWidth: number): number {
 export function calcTotalPages(canvasHeight: number, canvasWidth: number): number {
   return Math.ceil(canvasHeight / calcPageHeightPx(canvasWidth));
 }
+
+export function formatAvLine(od: string, og: string, acuite: string): string {
+  return [od && `OD : ${od}`, og && `OG : ${og}`, acuite && `Acuité : ${acuite}`]
+    .filter(Boolean)
+    .join(" — ");
+}
