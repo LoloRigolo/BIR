@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState } from "react";
 import { BilanData, defaultBilanData, emptyBilanData } from "@/types/bilan";
 import { BilanEphadData, defaultBilanEphadData, emptyBilanEphadData } from "@/types/bilanEphad";
-import { buildPdfFilename, calcPageHeightPx, calcTotalPages } from "@/lib/utils";
+import { buildPdfFilename, calcPageHeightPx, calcTotalPages, localDateStr } from "@/lib/utils";
 import FormPanel from "@/components/FormPanel";
 import PreviewPanel from "@/components/PreviewPanel";
 import SheetPreview from "@/components/SheetPreview";
@@ -21,17 +21,17 @@ const MODELS: { id: Model; label: string }[] = [
 export default function Home() {
   const [model, setModel] = useState<Model>("bilan");
 
-  // — Bilan neuro-visuel —
+  // â€” Bilan neuro-visuel â€”
   const [bilanData, setBilanData] = useState<BilanData>(defaultBilanData);
   const bilanRef = useRef<HTMLDivElement>(null);
 
-  // — EPADH —
+  // â€” EPADH â€”
   const [ephadData, setEphadData] = useState<BilanEphadData>(defaultBilanEphadData);
   const ephadRef = useRef<HTMLDivElement>(null);
 
   const [loading, setLoading] = useState(false);
 
-  // ── Handlers bilan ──────────────────────────────────────────────────────────
+  // â”€â”€ Handlers bilan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function handleBilanChange(field: keyof BilanData, value: string) {
     setBilanData((prev) => ({ ...prev, [field]: value }));
@@ -39,10 +39,10 @@ export default function Home() {
 
   function handleBilanReset() {
     if (!confirm("Vider tous les champs ?")) return;
-    setBilanData({ ...emptyBilanData, docDate: new Date().toISOString().slice(0, 10) });
+    setBilanData({ ...emptyBilanData, docDate: localDateStr() });
   }
 
-  // ── Handlers EPADH ─────────────────────────────────────────────────────────
+  // â”€â”€ Handlers EPADH â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   function handleEphadChange(field: keyof BilanEphadData, value: string | boolean) {
     setEphadData((prev) => ({ ...prev, [field]: value }));
@@ -50,10 +50,10 @@ export default function Home() {
 
   function handleEphadReset() {
     if (!confirm("Vider tous les champs ?")) return;
-    setEphadData({ ...emptyBilanEphadData, docDate: new Date().toISOString().slice(0, 10) });
+    setEphadData({ ...emptyBilanEphadData, docDate: localDateStr() });
   }
 
-  // ── Téléchargement PDF ──────────────────────────────────────────────────────
+  // â”€â”€ TÃ©lÃ©chargement PDF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   async function handleDownload() {
     const ref = model === "bilan" ? bilanRef : ephadRef;
@@ -97,7 +97,7 @@ export default function Home() {
       const filename =
         model === "bilan"
           ? buildPdfFilename(bilanData.patPrenom, bilanData.patNom)
-          : buildPdfFilename(ephadData.patPrenom, ephadData.patNom);
+          : buildPdfFilename(ephadData.patPrenom, ephadData.patNom, "ephad");
       pdf.save(filename);
     } catch (e) {
       alert("Erreur PDF : " + (e as Error).message);
@@ -109,13 +109,13 @@ export default function Home() {
 
   return (
     <>
-      {/* ── Header ── */}
+      {/* â”€â”€ Header â”€â”€ */}
       <header className="px-6 bg-white border-b border-[#d0d2d6]">
         <div className="flex items-center gap-4 pt-4 pb-3 flex-wrap">
           <h1 className="text-[17px] font-semibold m-0 mr-2">
-            Orthoptie <span className="text-[#2f5fa8]">→</span> PDF
+            Orthoptie <span className="text-[#2f5fa8]">â†’</span> PDF
           </h1>
-          {/* Nav modèles */}
+          {/* Nav modÃ¨les */}
           <nav className="flex gap-1">
             {MODELS.map(({ id, label }) => (
               <button
@@ -133,12 +133,12 @@ export default function Home() {
             ))}
           </nav>
           <p className="m-0 text-[#6b6e74] text-[13px] ml-auto hidden sm:block">
-            Remplis les champs, l&apos;aperçu se met à jour en direct.
+            Remplis les champs, l&apos;aperÃ§u se met Ã  jour en direct.
           </p>
         </div>
       </header>
 
-      {/* ── Contenu selon le modèle ── */}
+      {/* â”€â”€ Contenu selon le modÃ¨le â”€â”€ */}
       {model === "bilan" ? (
         <div className="grid grid-cols-[540px_1fr] items-start max-[1080px]:grid-cols-1">
           <FormPanel
@@ -163,7 +163,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* Éléments cachés pour la capture PDF */}
+      {/* Ã‰lÃ©ments cachÃ©s pour la capture PDF */}
       <div aria-hidden="true" style={{ position: "fixed", top: 0, left: "-9999px", width: 794, pointerEvents: "none", zIndex: -1 }}>
         <SheetPreview ref={bilanRef} data={bilanData} />
         <SheetEphad ref={ephadRef} data={ephadData} />

@@ -1,4 +1,4 @@
-export interface BilanEphadData {
+﻿export interface BilanEphadData {
   // Praticien 1
   pratNom: string;
   pratMeta: string;
@@ -17,17 +17,17 @@ export interface BilanEphadData {
   patPrenom: string;
   patDdn: string;
 
-  // Anamnèse
+  // AnamnÃ¨se
   anamnese: string;
 
-  // Équipement actuel
+  // Ã‰quipement actuel
   equipCorrection: string;
 
-  // Réfraction automatique
+  // RÃ©fraction automatique
   raOd: string;
   raOg: string;
 
-  // Acuité visuelle
+  // AcuitÃ© visuelle
   avlOd: string;
   avlOg: string;
   avlAcuite: string;
@@ -38,7 +38,7 @@ export interface BilanEphadData {
   // Correction retenue
   correctionRetenue: string;
 
-  // Examens complémentaires
+  // Examens complÃ©mentaires
   examAucun: boolean;
   examOphtalmo: boolean;
   examFondOeil: boolean;
@@ -49,12 +49,14 @@ export interface BilanEphadData {
   observations: string;
 }
 
+import { localDateStr } from "@/lib/utils";
+
 export const defaultBilanEphadData: BilanEphadData = {
   pratNom: "Mme RALE Isabelle",
   pratMeta: "Orthoptiste\n43 av Carnot\n30100 ALES\nisabelle.rale.orthoptiste@gmail.com",
   pratNom2: "Axel Rakowski",
   pratMeta2: "Opticien",
-  docDate: new Date().toISOString().slice(0, 10),
+  docDate: localDateStr(),
   docType: "Intervention en Maison de Retraite",
   docLieu: "",
   patNom: "",
@@ -84,7 +86,7 @@ export const emptyBilanEphadData: BilanEphadData = {
   pratMeta: "",
   pratNom2: "",
   pratMeta2: "",
-  docDate: new Date().toISOString().slice(0, 10),
+  docDate: localDateStr(),
   docType: "",
   docLieu: "",
   patNom: "",

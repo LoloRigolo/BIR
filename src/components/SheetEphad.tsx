@@ -95,7 +95,7 @@ function PageFooter({
       }}
     >
       <div>
-        Fiche d'examen visuel
+        Fiche d&apos;examen visuel
         {patPrenom ? ` — ${patPrenom} ${patNom}` : ""}
       </div>
       <div style={{ textAlign: "right" }}>

@@ -1,26 +1,26 @@
-import { describe, it, expect } from "vitest";
-import { formatAvLine } from "../lib/utils";
+﻿import { describe, it, expect } from "vitest";
+import { formatAvLine, localDateStr } from "../lib/utils";
 import {
   defaultBilanEphadData,
   emptyBilanEphadData,
 } from "../types/bilanEphad";
 
-// ── formatAvLine ──────────────────────────────────────────────────────────────
+// -- formatAvLine -------------------------------------------------------------
 
 describe("formatAvLine", () => {
   it("returns empty string when all fields are empty", () => {
     expect(formatAvLine("", "", "")).toBe("");
   });
 
-  it("returns only OD when OG and acuité are empty", () => {
+  it("returns only OD when OG and acuite are empty", () => {
     expect(formatAvLine("10/10", "", "")).toBe("OD : 10/10");
   });
 
-  it("returns only OG when OD and acuité are empty", () => {
+  it("returns only OG when OD and acuite are empty", () => {
     expect(formatAvLine("", "9/10", "")).toBe("OG : 9/10");
   });
 
-  it("returns only acuité when OD and OG are empty", () => {
+  it("returns only acuite when OD and OG are empty", () => {
     expect(formatAvLine("", "", "P2")).toBe("Acuité : P2");
   });
 
@@ -30,16 +30,16 @@ describe("formatAvLine", () => {
     );
   });
 
-  it("joins OD and OG when acuité is empty", () => {
+  it("joins OD and OG when acuite is empty", () => {
     expect(formatAvLine("10/10", "9/10", "")).toBe("OD : 10/10 — OG : 9/10");
   });
 
-  it("joins OD and acuité when OG is empty", () => {
+  it("joins OD and acuite when OG is empty", () => {
     expect(formatAvLine("10/10", "", "P2")).toBe("OD : 10/10 — Acuité : P2");
   });
 });
 
-// ── defaultBilanEphadData ─────────────────────────────────────────────────────
+// -- defaultBilanEphadData ----------------------------------------------------
 
 describe("defaultBilanEphadData", () => {
   it("has a practitioner name set by default", () => {
@@ -50,9 +50,8 @@ describe("defaultBilanEphadData", () => {
     expect(defaultBilanEphadData.docType).toBeTruthy();
   });
 
-  it("has today's date by default", () => {
-    const today = new Date().toISOString().slice(0, 10);
-    expect(defaultBilanEphadData.docDate).toBe(today);
+  it("has today local date by default", () => {
+    expect(defaultBilanEphadData.docDate).toBe(localDateStr());
   });
 
   it("has all checkbox fields set to false by default", () => {
@@ -63,7 +62,7 @@ describe("defaultBilanEphadData", () => {
   });
 });
 
-// ── emptyBilanEphadData ───────────────────────────────────────────────────────
+// -- emptyBilanEphadData ------------------------------------------------------
 
 describe("emptyBilanEphadData", () => {
   it("has empty string for all string fields", () => {
@@ -89,8 +88,7 @@ describe("emptyBilanEphadData", () => {
     expect(emptyBilanEphadData.examOct).toBe(false);
   });
 
-  it("has today's date", () => {
-    const today = new Date().toISOString().slice(0, 10);
-    expect(emptyBilanEphadData.docDate).toBe(today);
+  it("has today local date", () => {
+    expect(emptyBilanEphadData.docDate).toBe(localDateStr());
   });
 });

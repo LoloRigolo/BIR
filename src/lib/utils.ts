@@ -12,11 +12,16 @@ export function dateFr(iso: string): string {
   );
 }
 
-export function buildPdfFilename(patPrenom: string, patNom: string): string {
+export function localDateStr(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function buildPdfFilename(patPrenom: string, patNom: string, prefix = "bilan"): string {
   const prenom = patPrenom || "patient";
   const nom = patNom || "";
   return (
-    ("bilan_" + prenom + "_" + nom)
+    (prefix + "_" + prenom + "_" + nom)
       .replace(/\s+/g, "_")
       .replace(/_+$/, "") + ".pdf"
   );
